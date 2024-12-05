@@ -17,10 +17,12 @@ async def create_document(
     document_data: DocumentCreate,
     session: AsyncSession = Depends(get_session),
 ):
-
     new_document = Document(**document_data.model_dump())
-    saved_document = await new_document.save(session)
-    return saved_document
+    if not await new_document.exist_pini(session):
+        new_document = await new_document.save(session)
+        return new_document
+    else:
+        return await new_document.get_by_pini(session)
 
 
 @documents_router.get("/")

@@ -271,11 +271,16 @@ class Document(Base):
     commission_director: Mapped[str] = mapped_column(VARCHAR(255))
     finish: Mapped[bool] = mapped_column(BOOLEAN, default=False)
 
+    async def get_by_pini(self, session: AsyncSession):
+        return await self.get_where(session, self.__class__.pini == self.pini)
+
+    async def exist_pini(self, session: AsyncSession):
+        return await self.exist(session, self.__class__.pini == self.pini)
+
     async def search_by_query(self, session: AsyncSession, query: str):
         filters = [
             self.__class__.full_name.ilike(f"%{query}%"),
             self.__class__.pini.ilike(f"%{query}%"),
-            self.__class__.passport_series.ilike(f"%{query}%"),
             self.__class__.passport_series.ilike(f"%{query}%"),
         ]
         return await self.search_with_multi_filters(session, filters)
